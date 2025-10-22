@@ -1,7 +1,7 @@
 [project]
-name = "jpmc.mcp-for-api-documentation"
+name = "jpmc.mcp_for_api_documentation"
 version = "0.0.1"
-description = "A JPMorgan Chase (JPMC) Model Context Protocol (MCP) server for Payment Developer Portal (PDP) Documentation"
+description = "A JPMorgan Chase (JPMC) Model Context Protocol (MCP) server for Payments API Documentation"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -21,8 +21,8 @@ license = {text = "Apache-2.0"}
 license-files = ["LICENSE", "NOTICE"]
 
 authors = [
-    {name = "JPMorgan Chase PDP Team"},
-    {name = "JPMC PDP MCP", email = "jpmc-pdp-mcp@users.noreply.github.com"},
+    {name = "JPMorgan Payments API DocTeam"},
+    {name = "JPMC API Doc MCP", email = "jpmc-pdp-mcp@users.noreply.github.com"},
 ]
 classifiers = [
     "License :: OSI Approved :: Apache Software License",
@@ -36,7 +36,7 @@ classifiers = [
 ]
 
 [project.scripts]
-"jpmc.mcp-for-api-documentation" = "jpmc.mcp-for-api-documentation.server:main"
+"jpmc.mcp_for_api_documentation" = "jpmc.mcp_for_api_documentation.server:main"
 
 [project.urls]
 Homepage = "https://developer.payments.jpmorgan.com/"
@@ -111,7 +111,7 @@ version = "0.0.1"
 tag_format = "v$version"
 version_files = [
     "pyproject.toml:version",
-    "jpmc/mcp-for-api-documentation/__init__.py:__version__"
+    "jpmc/mcp_for_api_documentation/__init__.py:__version__"
 ]
 update_changelog_on_bump = true
 

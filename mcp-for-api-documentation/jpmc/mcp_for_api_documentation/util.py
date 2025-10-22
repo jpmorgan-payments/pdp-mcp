@@ -16,11 +16,12 @@
 # Modifications Copyright 2025 JPMorgan Chase (JPMC)
 # This file has been modified from its original version.
 # Significant changes include:
-# - changed several naming, from AWS to JPMorgan Chase (JPMC)/Payment Developer Portal (PDP).
+# - changed several naming, from AWS to JPMorgan Chase (JPMC)/Payments Developer Portal (PDP).
 # - removed several aws-specific html tags.
 
 
-"""Utility functions for JPMorgan Chase (JPMC) Payment Developer Portal (PDP) Documentation MCP Server.
+"""Utility functions for JPMorgan Chase (JPMC) Payments Developer Portal (PDP)
+API Documentation MCP Server.
 
 This module provides functions for processing HTML content, determining content types,
 formatting documentation results, and parsing recommendation API responses.
@@ -29,7 +30,7 @@ formatting documentation results, and parsing recommendation API responses.
 from typing import Any, Dict, List, Optional
 import markdownify
 
-from jpmc.pdp_doc_mcp_server.models import RecommendationResult
+from .models import RecommendationResult
 
 
 def extract_content_from_html(html: str) -> str:
@@ -98,16 +99,29 @@ def extract_content_from_html(html: str) -> str:
         # Define tags to strip - these are elements we don't want in the output
         tags_to_strip = [
             # Standard non-content HTML elements
-            'script', 'style', 'noscript', 'meta', 'link',
-            'footer', 'nav', 'aside', 'header',
-
+            'script',
+            'style',
+            'noscript',
+            'meta',
+            'link',
+            'footer',
+            'nav',
+            'aside',
+            'header',
             # JPMC-PDP specific elements
-            'js-show-more-buttons', 'js-show-more-text',
-            'feedback-container', 'feedback-section',
-            'doc-feedback-container', 'doc-feedback-section',
-            'warning-container', 'warning-section',
-            'cookie-banner', 'cookie-notice',
-            'copyright-section', 'legal-section', 'terms-section',
+            'js-show-more-buttons',
+            'js-show-more-text',
+            'feedback-container',
+            'feedback-section',
+            'doc-feedback-container',
+            'doc-feedback-section',
+            'warning-container',
+            'warning-section',
+            'cookie-banner',
+            'cookie-notice',
+            'copyright-section',
+            'legal-section',
+            'terms-section',
         ]
 
         # Convert HTML to Markdown
@@ -143,7 +157,11 @@ def is_html_content(page_raw: str, content_type: str) -> bool:
         True if content is HTML, False otherwise
     """
     # Check if content starts with HTML tag, has HTML content-type, or has no content-type (assume HTML)
-    return '<html' in page_raw[:100].lower() or 'text/html' in content_type.lower() or not content_type
+    return (
+        '<html' in page_raw[:100].lower()
+        or 'text/html' in content_type.lower()
+        or not content_type
+    )
 
 
 def format_documentation_result(url: str, content: str, start_index: int, max_length: int) -> str:
@@ -213,9 +231,7 @@ def parse_recommendation_results(data: Dict[str, Any]) -> List[RecommendationRes
             context = item.get('abstract') if 'abstract' in item else None
             results.append(
                 RecommendationResult(
-                    url=item.get('url', ''),
-                    title=item.get('assetTitle', ''),
-                    context=context
+                    url=item.get('url', ''), title=item.get('assetTitle', ''), context=context
                 )
             )
 
@@ -243,9 +259,7 @@ def parse_recommendation_results(data: Dict[str, Any]) -> List[RecommendationRes
             context = f'New content added on {date_created}' if date_created else 'New content'
             results.append(
                 RecommendationResult(
-                    url=item.get('url', ''),
-                    title=item.get('assetTitle', ''),
-                    context=context
+                    url=item.get('url', ''), title=item.get('assetTitle', ''), context=context
                 )
             )
 
@@ -255,9 +269,7 @@ def parse_recommendation_results(data: Dict[str, Any]) -> List[RecommendationRes
             context = item.get('abstract') if 'abstract' in item else 'Similar content'
             results.append(
                 RecommendationResult(
-                    url=item.get('url', ''),
-                    title=item.get('assetTitle', ''),
-                    context=context
+                    url=item.get('url', ''), title=item.get('assetTitle', ''), context=context
                 )
             )
 

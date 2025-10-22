@@ -16,15 +16,16 @@
 # Modifications Copyright 2025 JPMorgan Chase (JPMC)
 # This file has been modified from its original version.
 # Significant changes include:
-# - changed several naming, from AWS to JPMorgan Chase (JPMC)/Payment Developer Portal (PDP).
+# - changed several naming, from AWS to JPMorgan Chase (JPMC)/Payments Developer Portal (PDP).
 # - changed recommendation() to related(), and changed the implementation
 #   to use BeautifulSoup to extract links from the page, instead of calling AWS Doc API.
 # - changed search API to JPMC-PDP search API; changed aws doc website to jpmc pdp website.
 
-"""JPMorgan Chase (JPMC) Payment Developer Portal (PDP) Documentation MCP Server implementation.
+"""JPMorgan Chase (JPMC) Payments Developer Portal (PDP) API Documentation
+MCP Server implementation.
 
 This module implements the Model Context Protocol (MCP) server for accessing and
-searching the JPMorgan Chase Payment Developer Portal documentation.
+searching the JPMorgan Chase Payments API documentation.
 """
 
 # Standard library imports
@@ -43,16 +44,16 @@ from pydantic import Field
 from typing import Dict, List
 
 # Local imports
-from jpmc.pdp_doc_mcp_server.models import (
+from .models import (
     RecommendationResult,
     SearchResult,
 )
-from jpmc.pdp_doc_mcp_server.server_utils import (
+from .server_utils import (
     DEFAULT_USER_AGENT,
     read_documentation_impl,
     read_documentation_page_raw,
 )
-from jpmc.pdp_doc_mcp_server.util import (
+from .util import (
     parse_recommendation_results,
 )
 
@@ -72,8 +73,8 @@ mcp = FastMCP(
     instructions="""
     # JPMC-PDP Documentation MCP Server
 
-    JPMorgan Chase (JPMC) Payment Developer Portal (PDP).
-    This server provides tools to access public JPMC-PDP documentation, search for content, and get related.
+    JPMorgan Chase (JPMC) Payments Developer Portal (PDP).
+    This server provides tools to access public JPMC-PDP API documentation, search for content, and get related.
 
     ## Tool Selection Guide
 
@@ -100,7 +101,8 @@ async def search_documentation(
         le=50,
     ),
 ) -> List[SearchResult]:
-    """Search JPMC (JPMorgan Chase) documentation using the official JPMC Documentation Search API.
+    """Search JPMC (JPMorgan Chase) Payments API documentation using the official
+    JPMC API Documentation Search API.
 
     ## Usage
 
@@ -125,7 +127,7 @@ async def search_documentation(
     """
     logger.debug(f'Searching JPMC documentation for: {search_phrase}')
 
-    parameters = { 'searchQuery' : search_phrase }
+    parameters = {'searchQuery': search_phrase}
 
     search_url_with_session = f'{SEARCH_API_URL}?searchQuery={search_phrase}'
 
@@ -180,12 +182,12 @@ async def search_documentation(
                 )
             ]
 
-    #logger.error("PDP Search return data: {}".format(data))
+    logger.debug("PDP Search return data: {}".format(data))
     results = []
     if 'searchResponses' in data:
         for i, suggestion in enumerate(data['searchResponses'][:limit]):
             if 'summary' in suggestion:
-                text_suggestion = suggestion   # ['textExcerptSuggestion']
+                text_suggestion = suggestion  # ['textExcerptSuggestion']
                 context = None
 
                 # Add context if available
@@ -197,7 +199,7 @@ async def search_documentation(
                 results.append(
                     SearchResult(
                         rank_order=i + 1,
-                        url= PDP_BASE_URL + "/" + text_suggestion.get('url', ''),
+                        url=PDP_BASE_URL + '/' + text_suggestion.get('url', ''),
                         title=text_suggestion.get('title', ''),
                         context=context,
                     )
@@ -207,13 +209,12 @@ async def search_documentation(
     return results
 
 
-
 @mcp.tool()
 async def read_documentation(
     ctx: Context,
     url: str = Field(description='URL of the JPMC documentation page to read'),
 ) -> str:
-    """Fetch and convert a JPMC documentation page to markdown format.
+    """Fetch and convert a JPMC Payments API documentation page to markdown format.
 
     ## Usage
 
@@ -247,24 +248,26 @@ async def read_documentation(
     # Validate that URL is from developer.payments.jpmorgan.com.
     url_str = str(url)
     if not re.match(r'^https?://developer\.payments\.jpmorgan\.com/', url_str):
-        await ctx.error(f'Invalid URL: {url_str}. URL must be from the developer.payments.jpmorgan.com domain')
+        await ctx.error(
+            f'Invalid URL: {url_str}. URL must be from the developer.payments.jpmorgan.com domain'
+        )
         raise ValueError('URL must be from the developer.payments.jpmorgan.com domain')
 
     return await read_documentation_impl(ctx, url_str, 5000, 0, SESSION_UUID)
 
 
-
-
 @mcp.tool()
 async def related(
     ctx: Context,
-    url: str = Field(description='URL of the JPMC-PDP documentation page to get related pages for'),
+    url: str = Field(
+        description='URL of the JPMC-PDP documentation page to get related pages for'
+    ),
 ) -> List[RecommendationResult]:
-    """Get related content for an JPMC-PDP documentation page.
+    """Get related content for a JPMC-PDP Payments API documentation page.
 
     ## Usage
 
-    This tool provides related JPMC-PDP documentation pages based on a given URL.
+    This tool provides related JPMC-PDP Payments API documentation pages based on a given URL.
     Use it to discover additional relevant content that might not appear in search results.
 
     ## When to Use
@@ -296,8 +299,8 @@ async def related(
     # Fetch the HTML content of the page
     raw_html, content_type = await read_documentation_page_raw(ctx, url_str)
     if not raw_html or raw_html.startswith('Failed to fetch'):
-        logger.warning(f"Could not fetch content from {url_str}")
-        await ctx.error(f"Failed to retrieve content from {url_str}")
+        logger.warning(f'Could not fetch content from {url_str}')
+        await ctx.error(f'Failed to retrieve content from {url_str}')
         return []
 
     # Parse HTML with BeautifulSoup and extract related links
@@ -307,8 +310,8 @@ async def related(
         # Find the main content area (typically has id='main-content')
         main_content = soup.find(id='main-content')
         if not main_content:
-            logger.warning(f"Could not find main-content in {url_str}")
-            await ctx.error(f"Could not find main content area in the page: {url_str}")
+            logger.warning(f'Could not find main-content in {url_str}')
+            await ctx.error(f'Could not find main content area in the page: {url_str}')
             return []
 
         # Store unique results in a dictionary keyed by href to avoid duplicates
@@ -321,20 +324,18 @@ async def related(
 
             # Only include internal documentation links
             if href.startswith('/docs/'):
-                logger.debug(f"Found related link: {title} ({href})")
+                logger.debug(f'Found related link: {title} ({href})')
 
                 # Use href as key to avoid duplicates
                 results[href] = RecommendationResult(
-                    url=PDP_BASE_URL + href,
-                    title=title or "Untitled Link",
-                    context=None
+                    url=PDP_BASE_URL + href, title=title or 'Untitled Link', context=None
                 )
 
-        logger.debug(f"Found {len(results)} related pages for: {url_str}")
+        logger.debug(f'Found {len(results)} related pages for: {url_str}')
         return list(results.values())
 
     except Exception as e:
-        error_msg = f"Error extracting related links: {str(e)}"
+        error_msg = f'Error extracting related links: {str(e)}'
         logger.error(error_msg)
         await ctx.error(error_msg)
         return []

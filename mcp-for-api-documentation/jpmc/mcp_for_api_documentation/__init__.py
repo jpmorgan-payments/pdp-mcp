@@ -18,10 +18,10 @@
 # Significant changes include: changed package name; changed version number
 
 
-"""JPMorgan Chase (JPMC) Payment Developer Portal (PDP) Documentation MCP Server.
+"""JPMorgan Chase (JPMC) Payments Developer Portal (PDP) API Documentation MCP Server.
 
 This package implements a Model Context Protocol (MCP) server for accessing
-documentation from the JPMorgan Chase Payment Developer Portal. It provides
+documentation from the JPMorgan Chase Payments Developer Portal. It provides
 tools for searching documentation, fetching specific pages, and finding
 related content.
 

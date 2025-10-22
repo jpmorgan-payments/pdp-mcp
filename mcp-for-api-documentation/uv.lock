@@ -366,7 +366,7 @@ wheels = [
 ]
 
 [[package]]
-name = "jpmc-pdp-doc-mcp-server"
+name = "jpmc-mcp-for-api-documentation"
 version = "0.0.1"
 source = { editable = "." }
 dependencies = [

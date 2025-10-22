@@ -1,4 +1,4 @@
-jpmc.pdp-doc-mcp-server
+jpmc.mcp_for_api_documentation
 Copyright 2025 JPMorgan Chase (JPMC). All Rights Reserved.
 
 This project is based on awslabs.aws-documentation-mcp-server
@@ -9,8 +9,8 @@ This software has been modified by JPMorgan Chase (JPMC).
 Details of modifications can be found in the source code headers of the respective modified files.
 
 Key changes include:
-- Project name changed from awslabs.aws-documentation-mcp-server to jpmc.pdp-doc-mcp-server
-- Package name changed from awslabs.aws_documentation_mcp_server to jpmc.pdp_doc_mcp_server
-- API endpoints updated to use JPMorgan Chase Payment Developer Portal (PDP) documentation
-- References to AWS changed to JPMorgan Chase (JPMC) and Payment Developer Portal (PDP)
+- Project name changed from awslabs.aws-documentation-mcp-server to jpmc.mcp_for_api_documentation
+- Package name changed from awslabs.aws_documentation_mcp_server to jpmc.mcp_for_api_documentation
+- API endpoints updated to use JPMorgan Payments API documentation
+- References to AWS changed to JPMorgan Chase (JPMC) and Payments API
 - Implementation of the 'related' feature updated to use BeautifulSoup for HTML parsing

@@ -45,14 +45,9 @@ pip install git+<repository-url>
 
 Run the MCP server directly from the command line:
 
-```bash
-jpmc.mcp-for-api-documentation
-```
-
-Or using the Python module:
 
 ```bash
-python -m jpmc.mcp-for-api-documentation.server
+python -m jpmc.mcp_for_api_documentation.server
 ```
 
 ### Local Testing
@@ -61,12 +56,12 @@ python -m jpmc.mcp-for-api-documentation.server
 
 Run the standalone MCP server:
 ```bash
-uv --directory <path-to-project> run jpmc.mcp-for-api-documentation
+uv --directory <path-to-project> run jpmc.mcp_for_api_documentation
 ```
 
 With MCP Inspector:
 ```bash
-npx @modelcontextprotocol/inspector uv --directory <path-to-project> run jpmc.mcp-for-api-documentation
+npx @modelcontextprotocol/inspector uv --directory <path-to-project> run jpmc.mcp_for_api_documentation
 ```
 
 #### Windows
@@ -81,10 +76,10 @@ python -m venv .venv
 pip install "markdownify>=1.1.0" "mcp[cli]>=1.11.0" "pydantic>=2.10.6" "httpx>=0.27.0" "loguru>=0.7.0" "beautifulsoup4>=4.12.0"
 
 # Run server standalone
-python -m jpmc.mcp-for-api-documentation.server
+python -m jpmc.mcp_for_api_documentation.server
 
 # Or with MCP Inspector
-npx @modelcontextprotocol/inspector python -m jpmc.mcp-for-api-documentation.server
+npx @modelcontextprotocol/inspector python -m jpmc.mcp_for_api_documentation.server
 ```
 
 ## Integration with MCP Clients
@@ -98,13 +93,13 @@ Note: you may need to adjust the command and it args based on your environment a
 ```json
 {
   "mcpServers": {
-    "jpmc.mcp-for-api-documentation": {
+    "jpmc.mcp_for_api_documentation": {
       "command": "uv",
       "args": [
         "--directory", 
          "<path-to-this-py-project>", 
         "run",
-         "jpmc.mcp-for-api-documentation"
+         "jpmc.mcp_for_api_documentation"
       ],
       "env": {
         "FASTMCP_LOG_LEVEL": "ERROR"
@@ -175,7 +170,7 @@ I want to setup a checkout intent session, can you help me format the API reques
 I want to create a payment link, help me format the API request.
 ```
 ```
-I am a merchant developer, I want to create a jpmc checkout setup intent call, using python. my merchant id is 451207-smoke-tests-orb-diu.
+I am a merchant developer, I want to create a jpmc checkout setup intent call, using python. my merchant id is <MERCHANT ID>.
 ```
 
 

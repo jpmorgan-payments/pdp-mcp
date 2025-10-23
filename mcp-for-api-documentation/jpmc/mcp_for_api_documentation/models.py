@@ -18,7 +18,8 @@
 # Significant changes include: changed comments.
 
 
-"""Data models for JPMorgan Chase (JPMC) Payment Developer Portal (PDP) Documentation MCP Server.
+"""Data models for JPMorgan Chase (JPMC) Payments Developer Portal (PDP)
+API Documentation MCP Server.
 
 This module defines the Pydantic models used for structured data representation
 throughout the MCP server. These models ensure type safety and proper validation
@@ -32,7 +33,7 @@ from typing import Optional
 class SearchResult(BaseModel):
     """Search result from PDP documentation search API.
 
-    Represents a single result item returned from the Payment Developer Portal
+    Represents a single result item returned from the Payments Developer Portal
     search API. Includes ranking, URL, title, and optional contextual excerpt.
 
     Attributes:
@@ -41,16 +42,19 @@ class SearchResult(BaseModel):
         title: Page title
         context: Optional excerpt or summary from the document
     """
-    rank_order: int = Field(description="Relevance ranking (lower is more relevant)")
-    url: str = Field(description="Documentation page URL")
-    title: str = Field(description="Page title")
-    context: Optional[str] = Field(default=None, description="Excerpt or summary from the document")
+
+    rank_order: int = Field(description='Relevance ranking (lower is more relevant)')
+    url: str = Field(description='Documentation page URL')
+    title: str = Field(description='Page title')
+    context: Optional[str] = Field(
+        default=None, description='Excerpt or summary from the document'
+    )
 
 
 class RecommendationResult(BaseModel):
     """Recommendation result from PDP documentation.
 
-    Represents a related content recommendation from the Payment Developer Portal.
+    Represents a related content recommendation from the Payments Developer Portal.
     Includes URL, title, and optional contextual information about the relationship.
 
     Attributes:
@@ -58,6 +62,9 @@ class RecommendationResult(BaseModel):
         title: Page title
         context: Optional description of why this page is recommended
     """
-    url: str = Field(description="Documentation page URL")
-    title: str = Field(description="Page title")
-    context: Optional[str] = Field(default=None, description="Description of why this page is recommended")
+
+    url: str = Field(description='Documentation page URL')
+    title: str = Field(description='Page title')
+    context: Optional[str] = Field(
+        default=None, description='Description of why this page is recommended'
+    )

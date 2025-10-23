@@ -16,20 +16,20 @@
 # Modifications Copyright 2025 JPMorgan Chase (JPMC)
 # This file has been modified from its original version.
 # Significant changes include:
-# - changed several naming, from AWS to JPMorgan Chase (JPMC)/Payment Developer Portal (PDP).
+# - changed several naming, from AWS to JPMorgan Chase (JPMC)/Payments Developer Portal (PDP).
 # - extracted read_documentation_page_raw() from read_documentation_impl() for better reuse.
 
 """Utility functions for fetching and processing documentation pages.
 
 This module provides helper functions for the JPMorgan Chase (JPMC)
-Payment Developer Portal (PDP) Documentation MCP Server.
+Payments Developer Portal (PDP) API Documentation MCP Server.
 """
 
 import httpx
 import os
 from typing import Tuple, Optional
 
-from jpmc.pdp_doc_mcp_server.util import (
+from .util import (
     extract_content_from_html,
     format_documentation_result,
     is_html_content,
@@ -91,13 +91,13 @@ async def read_documentation_page_raw(
             error_msg = f'Failed to fetch {url_str}: {str(e)}'
             logger.error(error_msg)
             await ctx.error(error_msg)
-            return error_msg, "text/plain"
+            return error_msg, 'text/plain'
 
         if response.status_code >= 400:
             error_msg = f'Failed to fetch {url_str} - status code {response.status_code}'
             logger.error(error_msg)
             await ctx.error(error_msg)
-            return error_msg, "text/plain"
+            return error_msg, 'text/plain'
 
         page_raw = response.text
         content_type = response.headers.get('content-type', '')

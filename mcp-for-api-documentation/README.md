@@ -1,31 +1,49 @@
-# JP Morgan Payments API Documentation MCP Server
+# J.P. Morgan Model Context Protocol Server for Payments Developer Portal Documentation
 
-A Model Context Protocol (MCP) server for accessing JP Morgan Payments API documentation.
+A Model Context Protocol (MCP) server that provides seamless access to J.P. Morgan's Payment Developer Portal (PDP) documentation and resources. This server enables developers to search, read, and discover payment API documentation through AI-powered interfaces like GitHub Copilot.
 
-This MCP server provides tools to search Payments API documentation, fetch specific pages, and discover related content.
+## Overview
+
+This MCP server acts as a bridge between your development environment and the J.P. Morgan Payment Developer Portal, allowing you to:
+
+- Access comprehensive payment API documentation
+- Search for specific payment solutions and features
+- Discover related content and resources
+- Get contextual help while coding payment integrations
+
 
 ## Features
 
-- **Read Documentation**: Fetch and convert API documentation pages to markdown format
-- **Search Documentation**: Find relevant documentation using the API search API
-- **Related Content**: Discover related pages for a given documentation URL
+This MCP server provides three core capabilities to enhance your development experience:
+
+- **📚 Read Documentation**: Fetch and convert PDP API documentation pages to markdown format for easy consumption
+- **🔍 Search Documentation**: Find relevant documentation using the official PDP Search API
+- **🔗 Related Content**: Discover related pages and resources for comprehensive understanding
+
 
 ## Prerequisites
 
-- Python 3.10 or newer
-- Package manager: `uv` (recommended) or `pip`
-- For development: Git and Node.js (for MCP Inspector)
+Ensure your development environment meets these requirements:
+
+- **Python**: Version 3.10 or newer
+- **Package Manager**: `uv` or `pip`
+- **Development Tools**: Git and Node.js (required for MCP Inspector testing)
+
 
 ## Installation
 
-### Using uv (Recommended)
+Choose your preferred installation method:
 
-1. Install uv if you haven't already:
+### Option 1: Using uv (Recommended)
+
+`uv` provides faster dependency resolution and better environment management:
+
+1. **Install uv**:
    ```bash
    pip install uv
    ```
 
-2. Clone the repository and install the package:
+2. **Clone and setup**:
    ```bash
    git clone <repository-url>
    cd mcp-for-api-documentation
@@ -33,62 +51,77 @@ This MCP server provides tools to search Payments API documentation, fetch speci
    uv pip install -e .
    ```
 
-### Using pip
+### Option 2: Using pip
+
+For traditional Python environments:
 
 ```bash
 pip install git+<repository-url>
 ```
 
+> **Note**: Replace `<repository-url>` with the actual repository URL when available.
+
 ## Usage
 
-### Command Line
+### Running the Server
 
-Run the MCP server directly from the command line:
-
+Start the MCP server directly as a Python module:
 
 ```bash
+cd mcp-for-api-documentation
 python -m jpmc.mcp_for_api_documentation.server
 ```
 
-### Local Testing
+### Local Testing and Development
 
-#### MacOS/Linux
+Test the server locally using either package manager:
 
-Run the standalone MCP server:
+#### Testing with uv
+
+**Standalone server**:
 ```bash
 uv --directory <path-to-project> run jpmc.mcp_for_api_documentation
 ```
 
-With MCP Inspector:
+**With MCP Inspector** (for interactive testing):
 ```bash
 npx @modelcontextprotocol/inspector uv --directory <path-to-project> run jpmc.mcp_for_api_documentation
 ```
 
-#### Windows
+#### Testing with pip
 
-```powershell
-# Set up Python environment
+**Environment setup**:
+```bash
 cd <path-to-project>
 python -m venv .venv
+
+# Windows
 .venv\Scripts\activate
 
-# Install dependencies
-pip install "markdownify>=1.1.0" "mcp[cli]>=1.11.0" "pydantic>=2.10.6" "httpx>=0.27.0" "loguru>=0.7.0" "beautifulsoup4>=4.12.0"
+# macOS/Linux
+source .venv/bin/activate
+```
 
-# Run server standalone
+**Install dependencies**:
+```bash
+pip install "markdownify>=1.1.0" "mcp[cli]>=1.11.0" "pydantic>=2.10.6" "httpx>=0.27.0" "loguru>=0.7.0" "beautifulsoup4>=4.12.0"
+```
+
+**Run server**:
+```bash
+# Standalone
 python -m jpmc.mcp_for_api_documentation.server
 
-# Or with MCP Inspector
+# With MCP Inspector
 npx @modelcontextprotocol/inspector python -m jpmc.mcp_for_api_documentation.server
 ```
 
+
 ## Integration with MCP Clients
 
-Configure the MCP server in your MCP client (e.g., Copilot in VS Code or IntelliJ):
+Configure the MCP server with your preferred MCP client (e.g., GitHub Copilot in VS Code or IntelliJ IDEA):
 
-Note: you may need to adjust the command and it args based on your environment and installation method. For example,
-(1) use the absolute path for "uv", or use "python" directly if "uv" is not available.
-(2) in a corp network behind proxy, you may need to set up a "HTTP_PROXY" in the "env" section.
+### Configuration Example
 
 ```json
 {
@@ -96,11 +129,39 @@ Note: you may need to adjust the command and it args based on your environment a
     "jpmc.mcp_for_api_documentation": {
       "command": "uv",
       "args": [
-        "--directory", 
-         "<path-to-this-py-project>", 
+        "--directory",
+        "<path-to-this-py-project>",
         "run",
-         "jpmc.mcp_for_api_documentation"
+        "jpmc.mcp_for_api_documentation"
       ],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    }
+  }
+}
+```
+
+### Configuration Notes
+
+⚠️ **Important**: Adjust the configuration based on your environment:
+
+1. **Command Path**: Use the absolute path for `uv`, or substitute `"python"` if `uv` is unavailable
+2. **Corporate Networks**: Add `"HTTP_PROXY": "your-proxy-url"` to the `env` section if behind a proxy
+3. **Project Path**: Replace `<path-to-this-py-project>` with the actual path to your installation
+
+### Alternative Configuration (using Python directly)
+
+```json
+{
+  "mcpServers": {
+    "jpmc.mcp_for_api_documentation": {
+      "command": "python",
+      "args": [
+        "-m",
+        "jpmc.mcp_for_api_documentation.server"
+      ],
+      "cwd": "<path-to-this-py-project>",
       "env": {
         "FASTMCP_LOG_LEVEL": "ERROR"
       }
@@ -111,83 +172,154 @@ Note: you may need to adjust the command and it args based on your environment a
 
 ## Available Tools
 
-The server provides the following tools for accessing JP Morgan Payments API documentation:
+The server provides three tools for accessing J.P. Morgan Payments API documentation:
 
-### search_documentation
+### 🔍 search_documentation
 
-Searches across all API documentation using the official Search API.
+Search across all PDP API documentation using the official Search API.
 
-**Parameters:**
+**Function Signature:**
 ```python
 search_documentation(
     search_phrase: str,  # The phrase to search for
-    limit: int = 10      # Maximum number of results (optional, default: 10)
-) -> list[dict]          # Returns a list of matching document references
+    limit: int = 10      # Maximum number of results (1-50, default: 10)
+) -> List[SearchResult]  # Returns matching document references
 ```
 
-### read_documentation
+**Example Usage:**
+```python
+# Search for checkout documentation
+results = search_documentation("checkout session", limit=5)
+```
 
-Fetches and converts a specific API documentation page to markdown format.
+### 📖 read_documentation
 
-**Parameters:**
+Fetch and convert a specific PDP documentation page to markdown format.
+
+**Function Signature:**
 ```python
 read_documentation(
     url: str            # URL of the documentation page to read
 ) -> str                # Returns markdown-formatted content
 ```
 
-### related
+**Example Usage:**
+```python
+# Read a specific documentation page
+content = read_documentation("https://developer.payments.jpmorgan.com/docs/commerce/...")
+```
 
-Provides related content recommendations for a specific API documentation page.
+### 🔗 related
 
-**Parameters:**
+Discover related content recommendations for a specific documentation page.
+
+**Function Signature:**
 ```python
 related(
-    url: str             # URL of the documentation page to get recommendations for
-) -> list[dict]          # Returns a list of related document references
+    url: str             # URL of the documentation page
+) -> List[RecommendationResult]  # Returns related document references
 ```
 
-## Example Queries, Prompts, or Instructions for LLM
-
-```
-Look up checkout-related documents, citing the sources
-```
-```
-Find documentation about payment methods
+**Example Usage:**
+```python
+# Find related pages
+related_docs = related("https://developer.payments.jpmorgan.com/docs/commerce/...")
 ```
 
+## Example Use Cases
+
+Here are practical examples of how to interact with the MCP server through your AI assistant:
+
+### 📚 Documentation Discovery
 ```
-Get related pages for https://developer.payments.jpmorgan.com/docs/commerce/optimization-protection/capabilities/consumer-profile-management/payment-methods
+"Look up checkout-related documents, citing the sources"
+```
+```
+"Find documentation about payment methods"
+```
+```
+"Search for information about webhooks and event notifications"
 ```
 
+### 🔗 Content Exploration
 ```
-I want to add a product to the merchant catalog, can you help me format the API request?
-```
-```
-I want to setup a checkout intent session, can you help me format the API request?
+"Get related pages for https://developer.payments.jpmorgan.com/docs/commerce/optimization-protection/capabilities/consumer-profile-management/payment-methods"
 ```
 ```
-I want to create a payment link, help me format the API request.
+"Show me similar documentation to the current page I'm reading"
+```
+
+### 🛠️ API Implementation Help
+```
+"I want to add a product to the merchant catalog, can you help me format the API request?"
 ```
 ```
-I am a merchant developer, I want to create a jpmc checkout setup intent call, using python. my merchant id is <MERCHANT ID>.
+"I want to setup a checkout intent session, can you help me format the API request?"
+```
+```
+"I want to create a payment link, help me format the API request"
+```
+```
+"I am a merchant developer, I want to create a JPMC checkout setup intent call using Python. My merchant ID is <MERCHANT_ID>"
+```
+
+### 🔍 Troubleshooting and Support
+```
+"How do I handle payment failures in the checkout process?"
+```
+```
+"What are the required fields for creating a payment session?"
+```
+```
+"Show me examples of webhook payload structures"
 ```
 
 
 ## Development
 
-### Running Tests
+Contributors and developers must use the following steps to run tests and validate changes.
 
-```bash
-pip install -e ".[dev]"
-pytest tests/
-```
+### Setting Up Development Environment
+
+1. **Clone and install in development mode**:
+   ```bash
+   git clone <repository-url>
+   cd mcp-for-api-documentation
+   pip install -e ".[dev]"
+   ```
+
+2. **Run tests**:
+   ```bash
+   pytest tests/
+   ```
 
 ### Environment Variables
 
-- `HTTP_PROXY` / `HTTPS_PROXY`: Proxy server for HTTP requests (optional)
-- `FASTMCP_LOG_LEVEL`: Logging level (default: WARNING)
+Configure the following environment variables as needed:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `HTTP_PROXY` | HTTP proxy server URL | None |
+| `HTTPS_PROXY` | HTTPS proxy server URL | None |
+| `FASTMCP_LOG_LEVEL` | Logging level (DEBUG, INFO, WARNING, ERROR) | WARNING |
+
+### Testing with Different Configurations
+
+**Test with proxy**:
+```bash
+HTTP_PROXY=http://proxy.company.com:8080 python -m jpmc.mcp_for_api_documentation.server
+```
+
+**Test with debug logging**:
+```bash
+FASTMCP_LOG_LEVEL=DEBUG python -m jpmc.mcp_for_api_documentation.server
+```
+
 
 ## License
 
 This project is licensed under the Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE) files for details.
+
+---
+
+**Questions or feedback?** Please reach out through the repository's issue tracker or contact the J.P. Morgan Payments Developer Portal team.

@@ -17,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.ACCESS_TOKEN_METRICS }}
 
       - name: Create metrics directory if it doesn't exist
         run: mkdir -p metrics
@@ -27,7 +27,7 @@ jobs:
           DATE=$(date -u +"%Y-%m-%d %H:%M:%S")
           
           # Get clone statistics (last 14 days)
-          CLONES_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          CLONES_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN_METRICS }}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/traffic/clones")
           
@@ -50,7 +50,7 @@ jobs:
           DATE=$(date -u +"%Y-%m-%d %H:%M:%S")
           
           # Get view statistics (last 14 days)
-          VIEWS_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          VIEWS_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN_METRICS }}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/traffic/views")
           
@@ -73,7 +73,7 @@ jobs:
           DATE=$(date -u +"%Y-%m-%d %H:%M:%S")
           
           # Get referrer statistics
-          REFERRERS_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          REFERRERS_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN_METRICS }}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/traffic/popular/referrers")
           

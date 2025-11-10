@@ -77,21 +77,29 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/traffic/popular/referrers")
           
+          echo "API Response: $REFERRERS_RESPONSE"
+          
           # Initialize CSV if it doesn't exist
           if [ ! -f metrics/referrer_stats.csv ]; then
             echo "Date,Referrer,Count,Uniques" > metrics/referrer_stats.csv
           fi
           
-          # Process each referrer and append to CSV
-          echo "$REFERRERS_RESPONSE" | jq -r --arg date "$DATE" '.[] | "\($date),\(.referrer // "direct"),\(.count // 0),\(.uniques // 0)"' >> metrics/referrer_stats.csv
-          
-          # If no referrers, add a line indicating that
-          if [ "$(echo "$REFERRERS_RESPONSE" | jq '. | length')" -eq 0 ]; then
-            echo "${DATE},no-referrers,0,0" >> metrics/referrer_stats.csv
+          # Check if response is valid JSON array
+          if echo "$REFERRERS_RESPONSE" | jq -e '. | type == "array"' > /dev/null 2>&1; then
+            # Process each referrer and append to CSV
+            echo "$REFERRERS_RESPONSE" | jq -r --arg date "$DATE" '.[] | "\($date),\(.referrer // "direct"),\(.count // 0),\(.uniques // 0)"' >> metrics/referrer_stats.csv
+            
+            # If no referrers, add a line indicating that
+            if [ "$(echo "$REFERRERS_RESPONSE" | jq '. | length')" -eq 0 ]; then
+              echo "${DATE},no-referrers,0,0" >> metrics/referrer_stats.csv
+            fi
+            
+            REFERRER_COUNT=$(echo "$REFERRERS_RESPONSE" | jq '. | length')
+            echo "Referrer stats collected: ${REFERRER_COUNT} referrers found"
+          else
+            echo "API returned error or invalid response for referrers, adding no-referrers entry"
+            echo "${DATE},api-error,0,0" >> metrics/referrer_stats.csv
           fi
-          
-          REFERRER_COUNT=$(echo "$REFERRERS_RESPONSE" | jq '. | length')
-          echo "Referrer stats collected: ${REFERRER_COUNT} referrers found"
 
       - name: Commit and push metrics
         run: |

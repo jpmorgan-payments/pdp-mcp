@@ -83,7 +83,7 @@ jobs:
           fi
 
           # Process each referrer and append to CSV
-          echo "$REFERRERS_RESPONSE" | jq -r --arg date "$DATE" '.[] | "\($date),\(.referrer // "direct"),\(.count // 0),\(.uniques // 0)"' >> metrics/referrer_stats.csv
+          echo "$REFERRERS_RESPONSE" | jq -r --arg date "$DATE" '.[] | "\($date),\(.referrer // "direct"),\(.count // 0),\(.uniques // 0)"' >> metrics/referrer-stats.csv
 
           # If no referrers, add a line indicating that
           if [ "$(echo "$REFERRERS_RESPONSE" | jq '. | length')" -eq 0 ]; then

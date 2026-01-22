@@ -37,11 +37,11 @@ jobs:
 
           # Initialize CSV if it doesn't exist
           if [ ! -f metrics/clone-stats.csv ]; then
-            echo "repository_name,date,clones,unique_cloners" > metrics/clone_stats.csv
+            echo "repository_name,date,clones,unique_cloners" > metrics/clone-stats.csv
           fi
 
           # Append new data
-          echo "${{ github.repository }},${DATE},${TOTAL_CLONES},${UNIQUE_CLONES}" >> metrics/clone_stats.csv
+          echo "${{ github.repository }},${DATE},${TOTAL_CLONES},${UNIQUE_CLONES}" >> metrics/clone-stats.csv
 
           echo "Clone stats collected: Total=${TOTAL_CLONES}, Unique=${UNIQUE_CLONES}"
 
@@ -78,8 +78,8 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/traffic/popular/referrers")
 
           # Initialize CSV if it doesn't exist
-          if [ ! -f metrics/referrer_stats.csv ]; then
-            echo "Date,Referrer,Count,Uniques" > metrics/referrer_stats.csv
+          if [ ! -f metrics/referrer-stats.csv ]; then
+            echo "Date,Referrer,Count,Uniques" > metrics/referrer-stats.csv
           fi
 
           # Process each referrer and append to CSV
@@ -87,7 +87,7 @@ jobs:
 
           # If no referrers, add a line indicating that
           if [ "$(echo "$REFERRERS_RESPONSE" | jq '. | length')" -eq 0 ]; then
-            echo "${DATE},no-referrers,0,0" >> metrics/referrer_stats.csv
+            echo "${DATE},no-referrers,0,0" >> metrics/referrer-stats.csv
           fi
 
           REFERRER_COUNT=$(echo "$REFERRERS_RESPONSE" | jq '. | length')

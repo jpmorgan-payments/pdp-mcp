@@ -83,16 +83,24 @@ jobs:
             echo "Date,Referrer,Count,Uniques" > metrics/referrer-stats.csv
           fi
 
-          # Process each referrer and append to CSV
-          echo "$REFERRERS_RESPONSE" | jq -r --arg date "$DATE" '.[] | "\($date),\(.referrer // "direct"),\(.count // 0),\(.uniques // 0)"' >> metrics/referrer-stats.csv
+          # Check if response is a valid array before processing
+          RESPONSE_TYPE=$(echo "$REFERRERS_RESPONSE" | jq -r 'type')
+          if [ "$RESPONSE_TYPE" = "array" ]; then
+            # Process each referrer and append to CSV
+            echo "$REFERRERS_RESPONSE" | jq -r --arg date "$DATE" '.[] | "\($date),\(.referrer // "direct"),\(.count // 0),\(.uniques // 0)"' >> metrics/referrer-stats.csv
 
-          # If no referrers, add a line indicating that
-          if [ "$(echo "$REFERRERS_RESPONSE" | jq '. | length')" -eq 0 ]; then
+            # If no referrers, add a line indicating that
+            if [ "$(echo "$REFERRERS_RESPONSE" | jq '. | length')" -eq 0 ]; then
+              echo "${DATE},no-referrers,0,0" >> metrics/referrer-stats.csv
+            fi
+
+            REFERRER_COUNT=$(echo "$REFERRERS_RESPONSE" | jq '. | length')
+            echo "Referrer stats collected: ${REFERRER_COUNT} referrers found"
+          else
+            # API returned an error or unexpected response
             echo "${DATE},no-referrers,0,0" >> metrics/referrer-stats.csv
+            echo "Referrer stats: API returned invalid response (type: ${RESPONSE_TYPE}), recorded as no referrers"
           fi
-
-          REFERRER_COUNT=$(echo "$REFERRERS_RESPONSE" | jq '. | length')
-          echo "Referrer stats collected: ${REFERRER_COUNT} referrers found"
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:

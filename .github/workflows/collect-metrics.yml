@@ -86,16 +86,17 @@ jobs:
           # Check if response is a valid array before processing
           RESPONSE_TYPE=$(echo "$REFERRERS_RESPONSE" | jq -r 'type')
           if [ "$RESPONSE_TYPE" = "array" ]; then
-            # Process each referrer and append to CSV
-            echo "$REFERRERS_RESPONSE" | jq -r --arg date "$DATE" '.[] | "\($date),\(.referrer // "direct"),\(.count // 0),\(.uniques // 0)"' >> metrics/referrer-stats.csv
-
-            # If no referrers, add a line indicating that
-            if [ "$(echo "$REFERRERS_RESPONSE" | jq '. | length')" -eq 0 ]; then
-              echo "${DATE},no-referrers,0,0" >> metrics/referrer-stats.csv
-            fi
-
             REFERRER_COUNT=$(echo "$REFERRERS_RESPONSE" | jq '. | length')
-            echo "Referrer stats collected: ${REFERRER_COUNT} referrers found"
+            
+            if [ "$REFERRER_COUNT" -eq 0 ]; then
+              # No referrers found
+              echo "${DATE},no-referrers,0,0" >> metrics/referrer-stats.csv
+              echo "Referrer stats collected: 0 referrers found"
+            else
+              # Process each referrer and append to CSV
+              echo "$REFERRERS_RESPONSE" | jq -r --arg date "$DATE" '.[] | "\($date),\(.referrer // "direct"),\(.count // 0),\(.uniques // 0)"' >> metrics/referrer-stats.csv
+              echo "Referrer stats collected: ${REFERRER_COUNT} referrers found"
+            fi
           else
             # API returned an error or unexpected response
             echo "${DATE},no-referrers,0,0" >> metrics/referrer-stats.csv

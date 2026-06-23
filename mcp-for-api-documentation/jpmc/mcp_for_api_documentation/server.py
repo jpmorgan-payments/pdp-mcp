@@ -90,15 +90,18 @@ mcp = FastMCP(
 )
 
 
+_SEARCH_PAGE_SIZE = 10
+
+
 @mcp.tool()
 async def search_documentation(
     ctx: Context,
     search_phrase: str = Field(description='Search phrase to use'),
     limit: int = Field(
-        default=10,
-        description='Maximum number of results to return',
+        default=100,
+        description='Maximum total number of results to return across all pages',
         ge=1,
-        le=50,
+        le=500,
     ),
 ) -> List[SearchResult]:
     """Search JPMC (JPMorgan Chase) Payments API documentation using the official
@@ -108,6 +111,7 @@ async def search_documentation(
 
     This tool searches across all JPMC-PDP documentation for pages matching your search phrase.
     Use it to find relevant documentation when you don't have a specific URL.
+    All pages of results are fetched automatically and accumulated before returning.
 
     ## Result Interpretation
 
@@ -120,92 +124,91 @@ async def search_documentation(
     Args:
         ctx: MCP context for logging and error handling
         search_phrase: Search phrase to use
-        limit: Maximum number of results to return
+        limit: Maximum total number of results to return (safety cap across all pages)
 
     Returns:
         List of search results with URLs, titles, and context snippets
     """
     logger.debug(f'Searching JPMC documentation for: {search_phrase}')
 
-    parameters = {'searchQuery': search_phrase}
-
-    search_url_with_session = f'{SEARCH_API_URL}?searchQuery={search_phrase}'
-
-    # Make proxy usage optional based on environment variable
     proxy_url = os.getenv('HTTP_PROXY') or os.getenv('HTTPS_PROXY')
     client_kwargs = {}
     if proxy_url:
         client_kwargs['proxy'] = proxy_url
 
-    async with httpx.AsyncClient(**client_kwargs) as client:
-        try:
-            response = await client.get(
-                search_url_with_session,
-                headers={
-                    'Content-Type': 'application/json',
-                    'User-Agent': DEFAULT_USER_AGENT,
-                    'X-MCP-Session-Id': SESSION_UUID,
-                },
-                timeout=30,
-            )
-        except httpx.HTTPError as e:
-            error_msg = f'Error searching JPMC-PDP docs: {str(e)}'
-            logger.error(error_msg)
-            await ctx.error(error_msg)
-            return [SearchResult(rank_order=1, url='', title=error_msg, context=None)]
-
-        if response.status_code >= 400:
-            error_msg = f'Error searching JPMC-PDP docs - status code {response.status_code}'
-            logger.error(error_msg)
-            await ctx.error(error_msg)
-            return [
-                SearchResult(
-                    rank_order=1,
-                    url='',
-                    title=error_msg,
-                    context=None,
-                )
-            ]
-
-        try:
-            data = response.json()
-        except json.JSONDecodeError as e:
-            error_msg = f'Error parsing search results: {str(e)}'
-            logger.error(error_msg)
-            await ctx.error(error_msg)
-            return [
-                SearchResult(
-                    rank_order=1,
-                    url='',
-                    title=error_msg,
-                    context=None,
-                )
-            ]
-
-    logger.debug("PDP Search return data: {}".format(data))
     results = []
-    if 'searchResponses' in data:
-        for i, suggestion in enumerate(data['searchResponses'][:limit]):
-            if 'summary' in suggestion:
-                text_suggestion = suggestion  # ['textExcerptSuggestion']
-                context = None
+    page = 1
 
-                # Add context if available
-                if 'summary' in text_suggestion:
-                    context = text_suggestion['summary']
-                elif 'suggestionBody' in text_suggestion:
-                    context = text_suggestion['suggestionBody']
-
-                results.append(
-                    SearchResult(
-                        rank_order=i + 1,
-                        url=PDP_BASE_URL + '/' + text_suggestion.get('url', ''),
-                        title=text_suggestion.get('title', ''),
-                        context=context,
-                    )
+    async with httpx.AsyncClient(**client_kwargs) as client:
+        while len(results) < limit:
+            logger.debug(f'Fetching search page {page} for: {search_phrase}')
+            try:
+                response = await client.get(
+                    SEARCH_API_URL,
+                    params={
+                        'searchQuery': search_phrase,
+                        'page': page,
+                        'pageSize': _SEARCH_PAGE_SIZE,
+                    },
+                    headers={
+                        'Content-Type': 'application/json',
+                        'User-Agent': DEFAULT_USER_AGENT,
+                        'X-MCP-Session-Id': SESSION_UUID,
+                    },
+                    timeout=30,
                 )
+            except httpx.HTTPError as e:
+                error_msg = f'Error searching JPMC-PDP docs: {str(e)}'
+                logger.error(error_msg)
+                await ctx.error(error_msg)
+                if not results:
+                    return [SearchResult(rank_order=1, url='', title=error_msg, context=None)]
+                break
 
-    logger.debug(f'Found {len(results)} search results for: {search_phrase}')
+            if response.status_code >= 400:
+                error_msg = f'Error searching JPMC-PDP docs - status code {response.status_code}'
+                logger.error(error_msg)
+                await ctx.error(error_msg)
+                if not results:
+                    return [SearchResult(rank_order=1, url='', title=error_msg, context=None)]
+                break
+
+            try:
+                data = response.json()
+            except json.JSONDecodeError as e:
+                error_msg = f'Error parsing search results: {str(e)}'
+                logger.error(error_msg)
+                await ctx.error(error_msg)
+                if not results:
+                    return [SearchResult(rank_order=1, url='', title=error_msg, context=None)]
+                break
+
+            logger.debug('PDP Search page {} return data: {}'.format(page, data))
+
+            page_items = data.get('searchResponses', [])
+            if not page_items:
+                break
+
+            for suggestion in page_items:
+                if len(results) >= limit:
+                    break
+                if 'summary' in suggestion:
+                    context = suggestion.get('summary') or suggestion.get('suggestionBody')
+                    results.append(
+                        SearchResult(
+                            rank_order=len(results) + 1,
+                            url=PDP_BASE_URL + '/' + suggestion.get('url', ''),
+                            title=suggestion.get('title', ''),
+                            context=context,
+                        )
+                    )
+
+            # Stop when the API returns a partial page — that signals the last page
+            if len(page_items) < _SEARCH_PAGE_SIZE:
+                break
+            page += 1
+
+    logger.debug(f'Found {len(results)} search results across {page} page(s) for: {search_phrase}')
     return results
 
 

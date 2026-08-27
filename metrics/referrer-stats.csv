@@ -555,3 +555,9 @@ Date,Referrer,Count,Uniques
 2026-08-26 06:05:29,jiradc-cib-cluster02.prod.aws.jpmchase.net,7,1
 2026-08-26 06:05:29,confluence.prod.aws.jpmchase.net,3,2
 2026-08-26 06:05:29,developer-test.payments.jpmorgan.com,3,1
+2026-08-27 08:56:43,developer.payments.jpmorgan.com,200,59
+2026-08-27 08:56:43,teams.public.onecdn.static.microsoft,33,8
+2026-08-27 08:56:43,github.com,27,11
+2026-08-27 08:56:43,Google,13,6
+2026-08-27 08:56:43,confluence.prod.aws.jpmchase.net,3,2
+2026-08-27 08:56:43,payments-developer-portal.prod.aws.jpmchase.net,1,1

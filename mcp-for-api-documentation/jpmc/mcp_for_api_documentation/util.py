@@ -96,6 +96,13 @@ def extract_content_from_html(html: str) -> str:
             for element in main_content.select(selector):
                 element.decompose()
 
+        # markdownify's `strip=` only unwraps these tags, it does not remove
+        # their text content - decompose them outright so nav/header/footer/aside
+        # text doesn't leak into the output.
+        for tag_name in ('nav', 'header', 'footer', 'aside', 'script', 'style'):
+            for element in main_content.find_all(tag_name):
+                element.decompose()
+
         # Define tags to strip - these are elements we don't want in the output
         tags_to_strip = [
             # Standard non-content HTML elements

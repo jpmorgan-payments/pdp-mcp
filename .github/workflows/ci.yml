@@ -4,10 +4,12 @@ on:
   pull_request:
     paths:
       - "mcp-for-api-documentation/**"
+      - ".github/workflows/**"
   push:
     branches: [main]
     paths:
       - "mcp-for-api-documentation/**"
+      - ".github/workflows/**"
 
 jobs:
   test:
@@ -21,7 +23,7 @@ jobs:
       - uses: astral-sh/setup-uv@v3
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --locked
 
       - name: Import smoke test
         run: uv run python -c "import jpmc.mcp_for_api_documentation.server"

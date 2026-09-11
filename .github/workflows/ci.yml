@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  pull_request:
+    paths:
+      - "mcp-for-api-documentation/**"
+  push:
+    branches: [main]
+    paths:
+      - "mcp-for-api-documentation/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mcp-for-api-documentation
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Import smoke test
+        run: uv run python -c "import jpmc.mcp_for_api_documentation.server"
+
+      - name: Run tests
+        run: uv run pytest -q
